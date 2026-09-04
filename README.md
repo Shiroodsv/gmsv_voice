@@ -23,7 +23,7 @@ require("voice")
 voice.Enable()
 ```
 
-Builds: `linux`, `linux64`, `win32`, `win64`. Linux binaries are built on Ubuntu 22.04 and need glibc 2.35 or newer. Build from source for older distros.
+Builds: `linux`, `linux64`, `win32`, `win64`. Linux binaries need glibc 2.34 or newer, which covers Ubuntu 22.04 and Debian 12. Build from source for older distros.
 
 ## Quick start
 
@@ -92,7 +92,7 @@ Decoding a 20 ms Opus frame takes a few microseconds. The hook has no measurable
 
 **Linux** resolves `SV_BroadcastVoiceData` from the engine's exported symbols. Nothing to configure. Both `engine.so` and `engine_srv.so` are handled.
 
-**Windows** `engine.dll` is stripped, so the function is found by byte pattern. Pass one with `voice.SetSignature` before `voice.Enable()`. Patterns break when the engine updates. Check the issues tab for current ones or find it yourself: it is the function that reads `sv_alltalk` and loops over connected clients.
+**Windows** `engine.dll` is stripped, so the function is found by byte pattern. Pass one with `voice.SetSignature` before `voice.Enable()`. Patterns break when the engine updates. If you have a working one, open an issue so others can use it. To find it yourself, look for the function that reads `sv_alltalk` and loops over connected clients.
 
 If the hook fails, `voice.Enable()` returns `false, reason` and nothing is captured.
 
