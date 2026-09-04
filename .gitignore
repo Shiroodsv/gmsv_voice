@@ -1,0 +1,14 @@
+build/
+out/
+*.dll
+*.so
+*.dylib
+*.o
+*.obj
+*.pdb
+*.wav
+.vs/
+.vscode/
+.idea/
+CMakeCache.txt
+CMakeFiles/
