@@ -114,7 +114,26 @@ void OnVoice(int entIndex, int userId, const uint8_t* data, size_t size) {
     s.packets++;
     s.bytes += size;
     s.lastPacket = now;
-    if (g_decode && s.opus.Decode(data, size, g_scratch)) {
+    // [SCP-939] Voix Steam : on retire l'en-tête et on garde le bloc Opus (0x06)
+    const uint8_t* payload = data;
+    size_t payloadSize = size;
+    if (size > 12 && data[4] == 0x01 && data[5] == 0x00 && data[6] == 0x10 && data[7] == 0x01) {
+        payload = nullptr;
+        payloadSize = 0;
+        size_t pos = 8, end = size - 4;
+        while (pos < end) {
+            uint8_t type = data[pos++];
+            if (type == 0x0B || type == 0x00) { pos += 2; continue; }
+            if (type == 0x06 && pos + 2 <= end) {
+                size_t len = data[pos] | (data[pos + 1] << 8);
+                pos += 2;
+                if (pos + len <= end) { payload = data + pos; payloadSize = len; }
+            }
+            break;
+        }
+    }
+    if (g_decode && payload && s.opus.Decode(payload, payloadSize, g_scratch)) {
+
         double gap = TrailingSeconds(s, now);
         if (gap > 0) {
             s.ring.PushSilence(std::min(static_cast<size_t>(gap * decoder::kSampleRate), Capacity()));
